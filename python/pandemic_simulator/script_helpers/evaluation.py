@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, Optional, Sequence, Union, List
 
 from .experiments import experiment_main
-from .sim_configs import small_town_config, medium_town_config, above_medium_town_config
+from .sim_configs import small_town_config, medium_town_config, above_medium_town_config, ut_config
 from ..data import H5DataSaver, StageSchedule
 from ..environment import PandemicSimOpts, PandemicSimConfig, PandemicRegulation, Risk
 

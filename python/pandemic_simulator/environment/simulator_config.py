@@ -44,6 +44,8 @@ class PandemicSimConfig:
     regulation_compliance_prob: float = 0.99
     """The probability that a person complies to regulation every step"""
 
+    student_compliance_prob: float = 0.65
+
     max_hospital_capacity: int = field(init=False, default=-1)
     """Specifies maximum hospital capacity (inferred from a hospital location if there is one)"""
 

@@ -1,10 +1,10 @@
 # Confidential, Copyright 2020, Sony Corporation of America, All rights reserved.
 
 from .person_routines import DefaultPersonRoutineAssignment
-from ..environment import Home, GroceryStore, Office, School, Hospital, RetailStore, HairSalon, Restaurant, Bar, \
+from ..environment import Home, GroceryStore, Office, School, Hospital, Campus, HybridCampus, Party, Apartment, Dorm, RetailStore, HairSalon, Restaurant, Bar, \
     PandemicSimConfig, LocationConfig
 
-__all__ = ['town_config', 'small_town_config', 'test_config',
+__all__ = ['ut_config', 'town_config', 'small_town_config', 'test_config',
            'tiny_town_config', 'medium_town_config',
            'above_medium_town_config']
 
@@ -14,6 +14,24 @@ A few references for the numbers selected:
 http://www.worldcitiescultureforum.com/data/number-of-restaurants-per-100.000-population (Austin)
 
 """
+
+ut_config = PandemicSimConfig(
+    num_persons=550,
+    location_configs=[
+        LocationConfig(Apartment, num=500),
+        LocationConfig(Dorm, num=500),
+        LocationConfig(GroceryStore, num=40, num_assignees=5, state_opts=dict(visitor_capacity=30)),
+        LocationConfig(Campus, num=100, num_assignees=4, state_opts=dict(visitor_capacity=40)),
+        LocationConfig(HybridCampus, num=100, num_assignees=4, state_opts=dict(visitor_capacity=40)),
+        LocationConfig(Party, num=30, num_assignees=4, state_opts=dict(visitor_capacity=15)),
+        LocationConfig(Hospital, num=10, num_assignees=30, state_opts=dict(patient_capacity=10)),
+        LocationConfig(RetailStore, num=40, num_assignees=5, state_opts=dict(visitor_capacity=10)),
+        LocationConfig(HairSalon, num=40, num_assignees=3, state_opts=dict(visitor_capacity=5)),
+        LocationConfig(Restaurant, num=20, num_assignees=6, state_opts=dict(visitor_capacity=30)),
+        LocationConfig(Bar, num=20, num_assignees=5, state_opts=dict(visitor_capacity=12)),
+    ],
+    person_routine_assignment=DefaultPersonRoutineAssignment())
+
 
 town_config = PandemicSimConfig(
     num_persons=10000,

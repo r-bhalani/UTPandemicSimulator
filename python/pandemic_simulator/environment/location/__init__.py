@@ -10,3 +10,8 @@ from .restaurant import *
 from .school import *
 from .store import *
 from .utils import *
+from .apartment import *
+from .campus import *
+from .hybrid_campus import *
+from .dorm import *
+from .party import *

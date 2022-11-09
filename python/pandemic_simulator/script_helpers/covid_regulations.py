@@ -1,9 +1,83 @@
 # Confidential, Copyright 2020, Sony Corporation of America, All rights reserved.
 from typing import List
 
-from ..environment import PandemicRegulation, DEFAULT, Risk, Office, School, HairSalon, RetailStore, Restaurant, Bar
+from ..environment import PandemicRegulation, DEFAULT, Risk, Office, School, HairSalon, RetailStore, Restaurant, Bar, Campus, HybridCampus
 
-__all__ = ['austin_regulations', 'italian_regulations', 'swedish_regulations']
+__all__ = ['ut_regulations', 'austin_regulations', 'italian_regulations', 'swedish_regulations']
+
+ut_regulations: List[PandemicRegulation] = [
+    PandemicRegulation(stay_home_if_sick=False,
+                       practice_good_hygiene=False,
+                       wear_facial_coverings=False,
+                       social_distancing=DEFAULT,
+                       risk_to_avoid_gathering_size={Risk.LOW: -1, Risk.HIGH: -1},
+                       location_type_to_rule_kwargs={
+                           Campus: {'lock': False},
+                           HybridCampus: {'lock': False},
+                           HairSalon: {'lock': False},
+                           RetailStore: {'lock': False},
+                           Bar: {'lock': False},
+                           Restaurant: {'lock': False},
+                       },
+                       stage=0),
+    PandemicRegulation(stay_home_if_sick=True,
+                       practice_good_hygiene=True,
+                       wear_facial_coverings=False,
+                       social_distancing=DEFAULT,
+                       risk_to_avoid_gathering_size={Risk.HIGH: 25, Risk.LOW: 50},
+                       location_type_to_rule_kwargs={
+                           Campus: {'lock': False},
+                           HybridCampus: {'lock': False},
+                           HairSalon: {'lock': False},
+                           RetailStore: {'lock': False},
+                           Restaurant: {'lock': False},
+                           Bar: {'lock': False},
+                       },
+                       stage=1),
+    PandemicRegulation(stay_home_if_sick=True,
+                       practice_good_hygiene=True,
+                       wear_facial_coverings=True,
+                       social_distancing=0.3,
+                       risk_to_avoid_gathering_size={Risk.HIGH: 10, Risk.LOW: 25},
+                       location_type_to_rule_kwargs={
+                           Campus: {'lock': False},
+                           HybridCampus: {'lock': True},
+                           HairSalon: {'lock': True},
+                           RetailStore: {'lock': False},
+                           Restaurant: {'lock': False},
+                           Bar: {'lock': False},
+                       },
+                       stage=2),
+    PandemicRegulation(stay_home_if_sick=True,
+                       practice_good_hygiene=True,
+                       wear_facial_coverings=True,
+                       social_distancing=0.5,
+                       risk_to_avoid_gathering_size={Risk.HIGH: 0, Risk.LOW: 0},
+                       location_type_to_rule_kwargs={
+                           Campus: {'lock': False},
+                           HybridCampus: {'lock': True},
+                           HairSalon: {'lock': True},
+                           RetailStore: {'lock': False},
+                           Restaurant: {'lock': True},
+                           Bar: {'lock': True},
+                       },
+                       stage=3),
+    PandemicRegulation(stay_home_if_sick=True,
+                       practice_good_hygiene=True,
+                       wear_facial_coverings=True,
+                       social_distancing=0.7,
+                       risk_to_avoid_gathering_size={Risk.HIGH: 0, Risk.LOW: 0},
+                       location_type_to_rule_kwargs={
+                        # Campus is only locked at the highest level of quarantine
+                           Campus: {'lock': True},
+                           HybridCampus: {'lock': True},
+                           HairSalon: {'lock': True},
+                           RetailStore: {'lock': True},
+                           Restaurant: {'lock': True},
+                           Bar: {'lock': True},
+                       },
+                       stage=4)
+]
 
 austin_regulations: List[PandemicRegulation] = [
     PandemicRegulation(stay_home_if_sick=False,

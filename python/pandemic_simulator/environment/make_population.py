@@ -3,18 +3,20 @@ from typing import List, cast
 from uuid import uuid4
 
 import numpy as np
+import random
 
 from .interfaces import globals, Risk, Person, PersonID, PersonState, BusinessBaseLocation
 from .job_counselor import JobCounselor
-from .location import Home, School
-from .person import Retired, Worker, Minor
+from .location import Apartment, Campus, Dorm, HybridCampus
+from .person import Faculty, Student
 from .simulator_config import PandemicSimConfig
 from ..utils import cluster_into_random_sized_groups
 
 __all__ = ['make_population']
 
 age_group = range(2, 101)
-
+students_age_group = range(18, 24)
+faculty_age_group = range(25, 90)
 
 def get_us_age_distribution(num_persons: int) -> List[int]:
     age_p = np.zeros(100)
@@ -28,6 +30,28 @@ def get_us_age_distribution(num_persons: int) -> List[int]:
     # print(f'Average age: {np.average(ages)}')
     return ages
 
+# Students are uniformly distributed across all ages
+def get_students_age_distribution(num_students: int) -> List[int]:
+    ages = [int(globals.numpy_rng.choice(np.arange(18, 24))) for _ in range(num_students)]
+    return ages
+
+# Faculty is distributed normally across the ages of 25 -> 90
+def get_faculty_age_distribution(num_faculty: int) -> List[int]:
+    age_p = np.zeros(65)
+    for i, age in enumerate(faculty_age_group):
+        if age < 60:
+            age_p[i] = globals.numpy_rng.normal(1, 0.05)
+        else:
+            age_p[i] = (1 + (age - 60) * (0.05 - 1) / (90 - 60)) * globals.numpy_rng.normal(1, 0.05)
+    age_p /= np.sum(age_p)
+    ages = [int(globals.numpy_rng.choice(np.arange(25, 90), p=age_p)) for _ in range(num_faculty)]
+    # print(f'Average age: {np.average(ages)}')
+    return ages
+
+def get_university_age_distribution(num_students: int, num_faculty: int) -> List[int]:
+    student_ages = get_students_age_distribution(num_students)
+    faculty_ages = get_faculty_age_distribution(num_faculty)
+    return np.vstack((student_ages, faculty_ages))
 
 def infection_risk(age: int) -> Risk:
     return cast(Risk,
@@ -67,96 +91,78 @@ def make_population(sim_config: PandemicSimConfig) -> List[Person]:
     numpy_rng = globals.numpy_rng
 
     persons: List[Person] = []
+    
+    # Using schools to represent the buildings on campus/classes at UT
+    campus_buildings = registry.location_ids_of_type(Campus)
+    # print("number of campus buildings: ", len(in_person_campus_buildings))
+    # hybrid_campus_buildings = registry.location_id_to_type(HybridCampus)
 
-    # ages based on the age profile of USA
-    ages = get_us_age_distribution(sim_config.num_persons)
-    numpy_rng.shuffle(ages)
-    minor_ages = []
-    adult_ages = []
-    retiree_ages = []
-    for age in ages:
-        if age <= 18:
-            minor_ages.append(age)
-        elif 18 < age <= 65:
-            adult_ages.append(age)
-        else:
-            retiree_ages.append(age)
+    # # Shuffle and combine the two to be able to assign students to each randomly
+    # # Conversion to list
+    # l = list(in_person_campus_buildings + hybrid_campus_buildings)
+    # random.shuffle(l)
+    # campus_buildings = tuple(l)
 
-    all_homes = list(registry.location_ids_of_type(Home))
+    test_ages = get_us_age_distribution(sim_config.num_persons)
+    # ages based on the age profile of UT
+    student_ages = get_students_age_distribution((int)(sim_config.num_persons * 0.95))
+    faculty_ages = get_faculty_age_distribution(sim_config.num_persons - len(student_ages))
+    
+
+    # ages = np.vstack((student_ages, faculty_ages))
+    # numpy_rng.shuffle(ages)
+    all_homes = list(registry.location_ids_of_type(Apartment))
     numpy_rng.shuffle(all_homes)
     unassigned_homes = all_homes
 
-    # a) Select 6.5% of retirees (age > 65) and cluster them as groups of 1 or 2 and assign each
-    # group to a nursing home.
-    num_retirees_in_nursing = np.ceil(len(retiree_ages) * 0.065).astype('int')
-    retirees_in_nursing_ages = retiree_ages[:num_retirees_in_nursing]
-    clustered_nursing_ages = cluster_into_random_sized_groups(retirees_in_nursing_ages, 1, 2, numpy_rng)
-    retiree_homes_ages = [(unassigned_homes[_i], _a) for _i, _g in enumerate(clustered_nursing_ages) for _a in _g]
-    nursing_homes = unassigned_homes[:len(clustered_nursing_ages)]
-    unassigned_homes = unassigned_homes[len(nursing_homes):]  # remove assigned nursing homes
-    unassigned_retiree_ages = retiree_ages[num_retirees_in_nursing:]
-    # create retirees in nursing homes
-    for home, age in retiree_homes_ages:
-        persons.append(Retired(person_id=PersonID(f'retired_{str(uuid4())}', age),
-                               home=home,
+    # Assign a staff member to their own homes
+    clustered_faculty = cluster_into_random_sized_groups(faculty_ages, 1, 2, numpy_rng)
+    print("faculty ages type: ", type(faculty_ages))
+    print("unassignedc homes: ", type(unassigned_homes))
+    # faculty_home_ages = [(unassigned_homes[_i], _a) for _i, _g in enumerate(faculty_ages) for _a in _g]
+    faculty_homes = unassigned_homes[:len(clustered_faculty)]
+    unassigned_homes = unassigned_homes[len(faculty_homes):] # remove assigned faculty homes
+    
+    for i in range(len(faculty_homes)):
+        persons.append(Faculty(person_id=PersonID(f'faculty_{str(uuid4())}', faculty_ages[i]),
+                               home=faculty_homes[i],
+                               work=numpy_rng.choice(campus_buildings) if len(campus_buildings) > 0 else None,
                                regulation_compliance_prob=sim_config.regulation_compliance_prob,
-                               init_state=PersonState(current_location=home, risk=infection_risk(age))))
+                               init_state=PersonState(current_location=faculty_homes[i], risk=infection_risk(faculty_ages[i]))))
+    
 
-    # b) Cluster minors into 1-3 sized uniform groups and assign each group to a home
-    schools = registry.location_ids_of_type(School)
-    clustered_minor_ages = cluster_into_random_sized_groups(minor_ages, 1, 3, numpy_rng)
-    assert len(unassigned_homes) >= len(clustered_minor_ages), 'not enough homes to assign all people'
-    minor_homes_ages = [(unassigned_homes[_i], _a) for _i, _g in enumerate(clustered_minor_ages) for _a in _g]
-    minor_homes = unassigned_homes[:len(clustered_minor_ages)]
-    unassigned_homes = unassigned_homes[len(minor_homes):]  # remove assigned minor homes
-    # create all minor
-    for home, age in minor_homes_ages:
-        persons.append(Minor(person_id=PersonID(f'minor_{str(uuid4())}', age),
+    # Create the students, most students live in groups of 1-4 in their apartments
+    # According to university housing and dining, at full capacity, about 14% of the total student population lives in on-campus dorms
+    # https://thedailytexan.com/2021/09/05/ut-austin-residence-halls-return-to-full-capacity/
+
+    dorms = list(registry.location_ids_of_type(Dorm))
+    print("num total dorms: ", len(dorms))
+    num_students_in_dorms = np.ceil(len(student_ages) * 0.138).astype('int')
+    students_in_dorms_ages = student_ages[:num_students_in_dorms]
+    print("num students in dorms: ", len(students_in_dorms_ages))
+    clustered_student_dorm_ages = cluster_into_random_sized_groups(students_in_dorms_ages, 1, 4, numpy_rng)
+    # dorms_ages = [(dorms[_i], _a) for _i, _g in enumerate(clustered_student_dorm_ages) for _a in _g]
+    unassigned_students = student_ages[num_students_in_dorms:]
+    for i in range(len(students_in_dorms_ages)):
+        persons.append(Student(person_id=PersonID(f'student_{str(uuid4())}', students_in_dorms_ages[i]),
+                               home=dorms[i],
+                               school=numpy_rng.choice(campus_buildings) if len(campus_buildings) > 0 else None,
+                               regulation_compliance_prob=sim_config.student_compliance_prob,
+                               init_state=PersonState(current_location=dorms[i], risk=infection_risk(students_in_dorms_ages[i]))))
+
+    # Make the rest of the students -> assign them to off-campus apartments
+    # Most students live in groups of 1-4
+    remaining_student_ages = cluster_into_random_sized_groups(unassigned_students, 1, 4, numpy_rng)
+    assert len(unassigned_homes) >= len(remaining_student_ages), 'not enough homes to assign all people'
+    student_apartment_ages = [(unassigned_homes[_i], _a) for _i, _g in enumerate(remaining_student_ages) for _a in _g]
+    student_homes = unassigned_homes[:len(remaining_student_ages)]
+    unassigned_homes = unassigned_homes[len(student_homes):]  # remove assigned student apartments
+    # create all student apartments
+    for home, age in student_apartment_ages:
+        persons.append(Student(person_id=PersonID(f'student_{str(uuid4())}', age),
                              home=home,
-                             school=numpy_rng.choice(schools) if len(schools) > 0 else None,
-                             regulation_compliance_prob=sim_config.regulation_compliance_prob,
+                             school=numpy_rng.choice(campus_buildings) if len(campus_buildings) > 0 else None,
+                             regulation_compliance_prob=sim_config.student_compliance_prob,
                              init_state=PersonState(current_location=home, risk=infection_risk(age))))
-
-    # c) Assign one adult to each minor-included homes and then distribute the remaining uniformly across
-    # all non-nursing homes
-    # nursing_homes, minor_homes, unassigned_homes
-    required_num_adults = len(minor_homes) + len(unassigned_homes) - len(unassigned_retiree_ages)
-    assert len(adult_ages) >= required_num_adults, (
-        f'not enough adults {required_num_adults} to ensure each minor home has at least a single '
-        f'adult and all the homes are filled.')
-    adult_homes_ages = [(_h, adult_ages[_i]) for _i, _h in enumerate(minor_homes)]
-    non_nursing_homes_ages = []
-
-    non_single_parent_minor_homes = minor_homes[int(len(minor_homes) * 0.23):]
-    homes_to_distribute = unassigned_homes + non_single_parent_minor_homes
-    numpy_rng.shuffle(homes_to_distribute)
-    unassigned_adult_ages = adult_ages[len(minor_homes):]
-    for i in range(len(unassigned_retiree_ages) + len(unassigned_adult_ages)):
-        home = homes_to_distribute[i % len(homes_to_distribute)]
-        if len(unassigned_retiree_ages) > 0:
-            age = unassigned_retiree_ages.pop(0)
-            non_nursing_homes_ages.append((home, age))
-        else:
-            age = unassigned_adult_ages.pop(0)
-            adult_homes_ages.append((home, age))
-
-    work_ids = registry.location_ids_of_type(BusinessBaseLocation)
-    assert len(work_ids) > 0, 'no business locations found!'
-    for home, age in adult_homes_ages:
-        job_counselor = JobCounselor(sim_config.location_configs)
-        work_package = job_counselor.next_available_work()
-        assert work_package, 'Not enough available jobs, increase the capacity of certain businesses'
-        persons.append(Worker(person_id=PersonID(f'worker_{str(uuid4())}', age),
-                              home=home,
-                              work=work_package.work,
-                              work_time=work_package.work_time,
-                              regulation_compliance_prob=sim_config.regulation_compliance_prob,
-                              init_state=PersonState(current_location=home, risk=infection_risk(age))))
-
-    for home, age in non_nursing_homes_ages:
-        persons.append(Retired(person_id=PersonID(f'retired_{str(uuid4())}', age),
-                               home=home,
-                               regulation_compliance_prob=sim_config.regulation_compliance_prob,
-                               init_state=PersonState(current_location=home, risk=infection_risk(age))))
 
     return persons

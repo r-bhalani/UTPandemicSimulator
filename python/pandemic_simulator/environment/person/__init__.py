@@ -6,3 +6,5 @@ from .minor import *
 from .retired import *
 from .routine_utils import *
 from .worker import *
+from .student import *
+from .faculty import *

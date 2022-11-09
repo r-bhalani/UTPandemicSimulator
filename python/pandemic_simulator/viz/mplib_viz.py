@@ -168,6 +168,7 @@ class BaseMatplotLibViz(PandemicViz):
             self.annotate_plot(ax, plot_ref_labels[ax_i])
         plt.tight_layout()
         plt.show()
+        plt.savefig("tutorials.pdf")
 
 
 class SimViz(BaseMatplotLibViz):

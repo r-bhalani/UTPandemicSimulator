@@ -37,6 +37,22 @@ pandemic\_simulator\.environment\.location\.home module
     :show-inheritance:
 
 pandemic\_simulator\.environment\.location\.hospital module
+-------------------------------------------------------
+
+.. automodule:: pandemic_simulator.environment.location.hybrid_campus
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pandemic\_simulator\.environment\.location\.hybrid_campus module
+-------------------------------------------------------
+
+.. automodule:: pandemic_simulator.environment.location.dorm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pandemic\_simulator\.environment\.location\.dorm module
 -----------------------------------------------------------
 
 .. automodule:: pandemic_simulator.environment.location.hospital
