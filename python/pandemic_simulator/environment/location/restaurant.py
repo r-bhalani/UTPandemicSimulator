@@ -10,9 +10,10 @@ __all__ = ['Bar', 'Restaurant', 'RestaurantState', 'BarState']
 
 @dataclass
 class RestaurantState(NonEssentialBusinessLocationState):
-    contact_rate: ContactRate = ContactRate(1, 1, 0, 0.3, 0.35, 0.1)
+    contact_rate: ContactRate = ContactRate(10, 10, 10, 0.7, 0.7, 0.7)
     open_time: SimTimeTuple = SimTimeTuple(hours=tuple(range(11, 16)) + tuple(range(19, 24)),
                                            week_days=tuple(range(1, 7)))
+    social_gathering_event: bool = True
 
 
 class Restaurant(NonEssentialBusinessBaseLocation[RestaurantState]):
@@ -22,7 +23,8 @@ class Restaurant(NonEssentialBusinessBaseLocation[RestaurantState]):
 
 @dataclass
 class BarState(NonEssentialBusinessLocationState):
-    contact_rate: ContactRate = ContactRate(1, 1, 0, 0.7, 0.2, 0.1)
+    contact_rate: ContactRate = ContactRate(10, 10, 10, 0.7, 0.7, 0.7)
+    social_gathering_event: bool = True
     open_time: SimTimeTuple = SimTimeTuple(hours=tuple(range(21, 24)), week_days=tuple(range(1, 7)))
 
 

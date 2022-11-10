@@ -41,10 +41,10 @@ class PandemicSimConfig:
     location_configs: Sequence[LocationConfig] = ()
     """Configs of all locations in the simulator"""
 
-    regulation_compliance_prob: float = 0.99
+    regulation_compliance_prob: float = 0.7
     """The probability that a person complies to regulation every step"""
 
-    student_compliance_prob: float = 0.65
+    student_compliance_prob: float = 0.5
 
     max_hospital_capacity: int = field(init=False, default=-1)
     """Specifies maximum hospital capacity (inferred from a hospital location if there is one)"""

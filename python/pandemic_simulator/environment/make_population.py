@@ -54,8 +54,12 @@ def get_university_age_distribution(num_students: int, num_faculty: int) -> List
     return np.vstack((student_ages, faculty_ages))
 
 def infection_risk(age: int) -> Risk:
-    return cast(Risk,
-                globals.numpy_rng.choice([Risk.LOW, Risk.HIGH], p=[1 - age / age_group.stop, age / age_group.stop]))
+    if age <= 24:
+        return cast(Risk,
+                globals.numpy_rng.choice([Risk.LOW, Risk.HIGH], p=[1 - age / students_age_group.stop, age / students_age_group.stop]))
+    else:
+        return cast(Risk,
+                globals.numpy_rng.choice([Risk.LOW, Risk.HIGH], p=[1 - age / faculty_age_group.stop, age / faculty_age_group.stop]))
 
 
 def make_population(sim_config: PandemicSimConfig) -> List[Person]:
@@ -143,26 +147,46 @@ def make_population(sim_config: PandemicSimConfig) -> List[Person]:
     clustered_student_dorm_ages = cluster_into_random_sized_groups(students_in_dorms_ages, 1, 4, numpy_rng)
     # dorms_ages = [(dorms[_i], _a) for _i, _g in enumerate(clustered_student_dorm_ages) for _a in _g]
     unassigned_students = student_ages[num_students_in_dorms:]
+    dorm_counter = 0
+    current_dorm_idx = 0
     for i in range(len(students_in_dorms_ages)):
+        # iterate into the next dorm
+        # then update the number of students remaining
+        if dorm_counter > 30:
+            current_dorm_idx += 1
+            dorm_counter = 0
         persons.append(Student(person_id=PersonID(f'student_{str(uuid4())}', students_in_dorms_ages[i]),
-                               home=dorms[i],
+                               home=dorms[current_dorm_idx],
                                school=numpy_rng.choice(campus_buildings) if len(campus_buildings) > 0 else None,
                                regulation_compliance_prob=sim_config.student_compliance_prob,
-                               init_state=PersonState(current_location=dorms[i], risk=infection_risk(students_in_dorms_ages[i]))))
+                               init_state=PersonState(current_location=dorms[current_dorm_idx], risk=infection_risk(students_in_dorms_ages[i]))))
+        dorm_counter += 1
 
     # Make the rest of the students -> assign them to off-campus apartments
-    # Most students live in groups of 1-4
-    remaining_student_ages = cluster_into_random_sized_groups(unassigned_students, 1, 4, numpy_rng)
+    # Most students live in groups of 2-5
+    remaining_student_ages = student_ages[:len(unassigned_students)]
     assert len(unassigned_homes) >= len(remaining_student_ages), 'not enough homes to assign all people'
-    student_apartment_ages = [(unassigned_homes[_i], _a) for _i, _g in enumerate(remaining_student_ages) for _a in _g]
+    num_roommates  = [int(globals.numpy_rng.choice(np.arange(2, 5))) for _ in range(len(unassigned_students))]
     student_homes = unassigned_homes[:len(remaining_student_ages)]
     unassigned_homes = unassigned_homes[len(student_homes):]  # remove assigned student apartments
     # create all student apartments
-    for home, age in student_apartment_ages:
-        persons.append(Student(person_id=PersonID(f'student_{str(uuid4())}', age),
-                             home=home,
+    current_apt_idx = 0
+    current_num_roommates = 0
+    current_roommate_capacity_idx = 0
+    print("remaining student ages: ", remaining_student_ages)
+    print(type(remaining_student_ages))
+    for i in range(len(unassigned_students)):
+        if current_num_roommates > num_roommates[current_apt_idx]:
+            # has exceeded capacity of this apartment -> move onto the next one
+            current_apt_idx += 1
+            current_num_roommates = 0
+            # current_roommate_capacity_idx += 1
+        persons.append(Student(person_id=PersonID(f'student_{str(uuid4())}', remaining_student_ages[i]),
+                             home=student_homes[current_apt_idx],
                              school=numpy_rng.choice(campus_buildings) if len(campus_buildings) > 0 else None,
                              regulation_compliance_prob=sim_config.student_compliance_prob,
-                             init_state=PersonState(current_location=home, risk=infection_risk(age))))
+                             init_state=PersonState(current_location=student_homes[current_apt_idx], risk=infection_risk(remaining_student_ages[i]))))
+        current_num_roommates += 1
+
 
     return persons
