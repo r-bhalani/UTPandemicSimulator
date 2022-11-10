@@ -23,7 +23,7 @@ class Restaurant(NonEssentialBusinessBaseLocation[RestaurantState]):
 
 @dataclass
 class BarState(NonEssentialBusinessLocationState):
-    contact_rate: ContactRate = ContactRate(10, 10, 10, 0.7, 0.7, 0.7)
+    contact_rate: ContactRate = ContactRate(20, 20, 20, 0.7, 0.7, 0.7)
     social_gathering_event: bool = True
     open_time: SimTimeTuple = SimTimeTuple(hours=tuple(range(21, 24)), week_days=tuple(range(1, 7)))
 
@@ -31,4 +31,5 @@ class BarState(NonEssentialBusinessLocationState):
 class Bar(AgeRestrictedBusinessBaseLocation[BarState]):
     """Implements a Bar"""
     state_type = BarState
-    age_limits = (21, 110)
+    # gets rid of age limit since lots of underaged students go to bars
+    age_limits = (19, 110)

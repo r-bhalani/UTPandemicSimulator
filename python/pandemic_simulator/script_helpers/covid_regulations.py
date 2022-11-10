@@ -24,7 +24,7 @@ ut_regulations: List[PandemicRegulation] = [
                        practice_good_hygiene=False,
                        wear_facial_coverings=False,
                        social_distancing=DEFAULT,
-                       risk_to_avoid_gathering_size={Risk.HIGH: 25, Risk.LOW: 50},
+                       risk_to_avoid_gathering_size={Risk.HIGH: -1, Risk.LOW: -1},
                        location_type_to_rule_kwargs={
                            Campus: {'lock': False},
                            HybridCampus: {'lock': False},
@@ -38,7 +38,7 @@ ut_regulations: List[PandemicRegulation] = [
                        practice_good_hygiene=False,
                        wear_facial_coverings=False,
                        social_distancing=DEFAULT,
-                       risk_to_avoid_gathering_size={Risk.HIGH: 10, Risk.LOW: 25},
+                       risk_to_avoid_gathering_size={Risk.HIGH: -1, Risk.LOW: -1},
                        location_type_to_rule_kwargs={
                            Campus: {'lock': False},
                            HybridCampus: {'lock': True},
@@ -51,8 +51,8 @@ ut_regulations: List[PandemicRegulation] = [
     PandemicRegulation(stay_home_if_sick=True,
                        practice_good_hygiene=False,
                        wear_facial_coverings=False,
-                       social_distancing=0.25,
-                       risk_to_avoid_gathering_size={Risk.HIGH: 0, Risk.LOW: 0},
+                       social_distancing=DEFAULT,
+                       risk_to_avoid_gathering_size={Risk.HIGH: -1, Risk.LOW: -1},
                        location_type_to_rule_kwargs={
                            Campus: {'lock': False},
                            HybridCampus: {'lock': True},
@@ -73,7 +73,7 @@ ut_regulations: List[PandemicRegulation] = [
                            HybridCampus: {'lock': True},
                            HairSalon: {'lock': True},
                            RetailStore: {'lock': True},
-                           Restaurant: {'lock': True},
+                           Restaurant: {'lock': False},
                            Bar: {'lock': True},
                        },
                        stage=4)

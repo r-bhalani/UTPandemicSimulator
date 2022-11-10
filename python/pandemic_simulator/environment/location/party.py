@@ -7,8 +7,9 @@ __all__ = ['Party', 'PartyState']
 
 @dataclass
 class PartyState(LocationState):
-    contact_rate: ContactRate = ContactRate(10, 10, 10, 0.9, 0.9, 0.9)
+    contact_rate: ContactRate = ContactRate(30, 30, 30, 0.9, 0.9, 0.9)
     visitor_time = SimTimeTuple(hours=tuple(range(22, 4)), days=tuple(globals.numpy_rng.randint(5, 365, 12)))
+    social_gathering_event: bool = True
 
 
 class Party(BaseLocation[PartyState]):

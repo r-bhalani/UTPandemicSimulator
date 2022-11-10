@@ -9,7 +9,7 @@ __all__ = ['GroceryStore', 'RetailStore', 'GroceryStoreState', 'RetailStoreState
 
 @dataclass
 class GroceryStoreState(BusinessLocationState):
-    contact_rate: ContactRate = ContactRate(0, 1, 0, 0.2, 0.25, 0.3)
+    contact_rate: ContactRate = ContactRate(10, 10, 10, 0.7, 0.7, 0.7)
     open_time: SimTimeTuple = SimTimeTuple(hours=tuple(range(7, 21)), week_days=tuple(range(0, 6)))
 
 
@@ -21,7 +21,7 @@ class GroceryStore(EssentialBusinessBaseLocation[GroceryStoreState]):
 
 @dataclass
 class RetailStoreState(NonEssentialBusinessLocationState):
-    contact_rate: ContactRate = ContactRate(0, 1, 0, 0.2, 0.25, 0.3)
+    contact_rate: ContactRate = ContactRate(5, 5, 5, 0.6, 0.6, 0.6)
     open_time: SimTimeTuple = SimTimeTuple(hours=tuple(range(7, 21)), week_days=tuple(range(0, 6)))
 
 

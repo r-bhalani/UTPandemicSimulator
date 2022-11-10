@@ -9,7 +9,7 @@ __all__ = ['Apartment', 'ApartmentState']
 
 @dataclass
 class ApartmentState(LocationState):
-    contact_rate: ContactRate = ContactRate(0, 1, 0, 0.5, 0.3, 0.3)
+    contact_rate: ContactRate = ContactRate(1, 1, 1, 0.7, 0.7, 0.7)
     visitor_time = SimTimeTuple(hours=tuple(range(19, 24)), days=tuple(globals.numpy_rng.randint(4, 365, 12)))
 
 

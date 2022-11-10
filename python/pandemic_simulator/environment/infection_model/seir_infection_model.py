@@ -29,7 +29,7 @@ class _SEIRLabel(Enum):
 
 class _AgeLimit(Enum):
     _4 = 4
-    _17 = 17
+    _24 = 24
     _49 = 49
     _64 = 64
     _200 = 200
@@ -37,12 +37,12 @@ class _AgeLimit(Enum):
 
 _DEFAULT_HOSP_RATE_SYMP = {
     (_AgeLimit._4, Risk.LOW): 0.0279,
-    (_AgeLimit._17, Risk.LOW): 0.0215,
+    (_AgeLimit._24, Risk.LOW): 0.0215,
     (_AgeLimit._49, Risk.LOW): 1.3215,
     (_AgeLimit._64, Risk.LOW): 2.8563,
     (_AgeLimit._200, Risk.LOW): 3.3873,
     (_AgeLimit._4, Risk.HIGH): 0.2791,
-    (_AgeLimit._17, Risk.HIGH): 0.2146,
+    (_AgeLimit._24, Risk.HIGH): 13.2154,
     (_AgeLimit._49, Risk.HIGH): 13.2154,
     (_AgeLimit._64, Risk.HIGH): 28.5634,
     (_AgeLimit._200, Risk.HIGH): 33.8733,
@@ -50,12 +50,12 @@ _DEFAULT_HOSP_RATE_SYMP = {
 
 _DEFAULT_DEATH_RATE_NEEDS_HOSP = {
     (_AgeLimit._4, Risk.LOW): 0.2390,
-    (_AgeLimit._17, Risk.LOW): 0.3208,
+    (_AgeLimit._24, Risk.LOW): 0.3208,
     (_AgeLimit._49, Risk.LOW): 0.2304,
     (_AgeLimit._64, Risk.LOW): 0.3049,
     (_AgeLimit._200, Risk.LOW): 0.4269,
     (_AgeLimit._4, Risk.HIGH): 0.2390,
-    (_AgeLimit._17, Risk.HIGH): 0.3208,
+    (_AgeLimit._24, Risk.HIGH): 0.3208,
     (_AgeLimit._49, Risk.HIGH): 0.2304,
     (_AgeLimit._64, Risk.HIGH): 0.3049,
     (_AgeLimit._200, Risk.HIGH): 0.4269,
@@ -63,12 +63,12 @@ _DEFAULT_DEATH_RATE_NEEDS_HOSP = {
 
 _DEFAULT_DEATH_RATE_HOSP = {
     (_AgeLimit._4, Risk.LOW): 0.0390,
-    (_AgeLimit._17, Risk.LOW): 0.1208,
+    (_AgeLimit._24, Risk.LOW): 0.1208,
     (_AgeLimit._49, Risk.LOW): 0.0304,
     (_AgeLimit._64, Risk.LOW): 0.1049,
     (_AgeLimit._200, Risk.LOW): 0.2269,
     (_AgeLimit._4, Risk.HIGH): 0.0390,
-    (_AgeLimit._17, Risk.HIGH): 0.1208,
+    (_AgeLimit._24, Risk.HIGH): 0.1208,
     (_AgeLimit._49, Risk.HIGH): 0.0304,
     (_AgeLimit._64, Risk.HIGH): 0.1049,
     (_AgeLimit._200, Risk.HIGH): 0.2269,

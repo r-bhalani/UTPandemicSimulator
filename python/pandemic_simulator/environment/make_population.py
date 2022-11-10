@@ -54,11 +54,11 @@ def get_university_age_distribution(num_students: int, num_faculty: int) -> List
     return np.vstack((student_ages, faculty_ages))
 
 def infection_risk(age: int) -> Risk:
-    if age <= 24:
-        return cast(Risk,
-                globals.numpy_rng.choice([Risk.LOW, Risk.HIGH], p=[1 - age / students_age_group.stop, age / students_age_group.stop]))
-    else:
-        return cast(Risk,
+    # if age <= 24:
+    #     return cast(Risk,
+    #             globals.numpy_rng.choice([Risk.LOW, Risk.HIGH], p=[1 - age / students_age_group.stop, age / students_age_group.stop]))
+    # else:
+    return cast(Risk,
                 globals.numpy_rng.choice([Risk.LOW, Risk.HIGH], p=[1 - age / faculty_age_group.stop, age / faculty_age_group.stop]))
 
 
@@ -97,17 +97,17 @@ def make_population(sim_config: PandemicSimConfig) -> List[Person]:
     persons: List[Person] = []
     
     # Using schools to represent the buildings on campus/classes at UT
-    campus_buildings = registry.location_ids_of_type(Campus)
-    # print("number of campus buildings: ", len(in_person_campus_buildings))
-    # hybrid_campus_buildings = registry.location_id_to_type(HybridCampus)
+    in_person_campus_buildings = registry.location_ids_of_type(Campus)
+    print("number of campus buildings: ", len(in_person_campus_buildings))
+    hybrid_campus_buildings = registry.location_ids_of_type(HybridCampus)
+    print("number of hybrid buildings: ", len(hybrid_campus_buildings))
 
-    # # Shuffle and combine the two to be able to assign students to each randomly
-    # # Conversion to list
-    # l = list(in_person_campus_buildings + hybrid_campus_buildings)
-    # random.shuffle(l)
-    # campus_buildings = tuple(l)
+    # Shuffle and combine the two to be able to assign students to each randomly
+    # Conversion to list
+    l = list(in_person_campus_buildings + hybrid_campus_buildings)
+    random.shuffle(l)
+    campus_buildings = tuple(l)
 
-    test_ages = get_us_age_distribution(sim_config.num_persons)
     # ages based on the age profile of UT
     student_ages = get_students_age_distribution((int)(sim_config.num_persons * 0.95))
     faculty_ages = get_faculty_age_distribution(sim_config.num_persons - len(student_ages))

@@ -29,69 +29,69 @@ def run_pandemic_sim() -> None:
         sim.step_day()
         viz.record(sim.state)
     
-    sim.impose_regulation(regulation=ps.sh.ut_regulations[0])  # stage 0
+    sim.impose_regulation(regulation=ps.sh.ut_regulations[1])  # stage 0
 
     # run regulation steps in the simulator
-    for _ in trange(5, desc='Simulating warmup'):
+    for _ in trange(10, desc='Simulating warmup'):
         sim.step_day()
         viz.record(sim.state)
     
-    sim.impose_regulation(regulation=ps.sh.ut_regulations[0])  # stage 0
+    sim.impose_regulation(regulation=ps.sh.ut_regulations[2])  # stage 0
 
     # run regulation steps in the simulator
-    for _ in trange(5, desc='Simulating warmup'):
+    for _ in trange(10, desc='Simulating warmup'):
         sim.step_day()
         viz.record(sim.state)
     
-    sim.impose_regulation(regulation=ps.sh.ut_regulations[0])  # stage 0
+    sim.impose_regulation(regulation=ps.sh.ut_regulations[3])  # stage 0
 
     # run regulation steps in the simulator
-    for _ in trange(5, desc='Simulating warmup'):
+    for _ in trange(10, desc='Simulating warmup'):
         sim.step_day()
         viz.record(sim.state)
 
     # impose a regulation
-    sim.impose_regulation(regulation=ps.sh.ut_regulations[0])  # stage 4
+    # sim.impose_regulation(regulation=ps.sh.ut_regulations[0])  # stage 4
+
+    # # run regulation steps in the simulator
+    # for _ in trange(100, desc='Simulating Fall 2020'):
+    #     sim.step_day()
+    #     viz.record(sim.state)
+
+    # impose a regulation
+    sim.impose_regulation(regulation=ps.sh.ut_regulations[3])  # stage 3
 
     # run regulation steps in the simulator
-    for _ in trange(100, desc='Simulating Fall 2020'):
+    for _ in trange(100, desc='Simulating Spring 2021'):
         sim.step_day()
         viz.record(sim.state)
 
-    # # impose a regulation
-    # sim.impose_regulation(regulation=ps.sh.ut_regulations[3])  # stage 3
 
-    # # run regulation steps in the simulator
-    # for _ in trange(100, desc='Simulating Spring 2021'):
-    #     sim.step_day()
-    #     viz.record(sim.state)
+    # impose a regulation
+    sim.impose_regulation(regulation=ps.sh.ut_regulations[3])  # stage 2
 
-
-    # # impose a regulation
-    # sim.impose_regulation(regulation=ps.sh.ut_regulations[2])  # stage 2
-
-    # # run regulation steps in the simulator
-    # for _ in trange(100, desc='Simulating Fall 2021'):
-    #     sim.step_day()
-    #     viz.record(sim.state)
+    # run regulation steps in the simulator
+    for _ in trange(100, desc='Simulating Fall 2021'):
+        sim.step_day()
+        viz.record(sim.state)
 
 
-    # # impose a regulation
-    # sim.impose_regulation(regulation=ps.sh.ut_regulations[1])  # stage 1
+    # impose a regulation
+    sim.impose_regulation(regulation=ps.sh.ut_regulations[1])  # stage 1
 
-    # # run regulation steps in the simulator
-    # for _ in trange(100, desc='Simulating Spring 2022'):
-    #     sim.step_day()
-    #     viz.record(sim.state)
+    # run regulation steps in the simulator
+    for _ in trange(100, desc='Simulating Spring 2022'):
+        sim.step_day()
+        viz.record(sim.state)
 
 
-    # # impose a regulation
-    # sim.impose_regulation(regulation=ps.sh.ut_regulations[0])  # stage 0
+    # impose a regulation
+    sim.impose_regulation(regulation=ps.sh.ut_regulations[0])  # stage 0
 
-    # # run regulation steps in the simulator
-    # for _ in trange(100, desc='Simulating Fall 2022'):
-    #     sim.step_day()
-    #     viz.record(sim.state)
+    # run regulation steps in the simulator
+    for _ in trange(100, desc='Simulating Fall 2022'):
+        sim.step_day()
+        viz.record(sim.state)
     
 
     # generate plots

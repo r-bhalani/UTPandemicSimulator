@@ -11,7 +11,7 @@ __all__ = ['HybridCampus', 'HybridCampusState']
 class HybridCampusState(NonEssentialBusinessLocationState):
     # student to student contact rate is much higher in college setting
     # because of lecture hall size and also people studying together
-    contact_rate: ContactRate = ContactRate(5, 1, 0, 0.7, 0., 0.1)
+    contact_rate: ContactRate = ContactRate(20, 20, 20, 0.7, 0.7, 0.7)
     # students spend much longer time on campus
     open_time: SimTimeTuple = SimTimeTuple(hours=tuple(range(8, 18)), week_days=tuple(range(0, 5)))
 
